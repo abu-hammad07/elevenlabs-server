@@ -31,7 +31,7 @@ async function createAuthenticatedAgent() {
           allowlist: [
             { hostname: "example.com" },
             { hostname: "node.botifire.com" },
-            { hostname: "localhost:5000" },
+            { hostname: "localhost:3000" },
           ],
         },
       },
