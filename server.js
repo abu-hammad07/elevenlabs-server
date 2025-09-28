@@ -4,13 +4,17 @@ import dotenv from 'dotenv';
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables
 dotenv.config();
 
 const app = express();
 app.use(cors());
 
+// Define the port and check for environment variables
 const PORT = process.env.PORT || 3000;
 const apiKey = process.env.ELEVENLABS_API_KEY;
 const agentId = process.env.AGENT_ID;
@@ -29,16 +33,14 @@ const elevenlabs = new ElevenLabsClient({
   apiKey: apiKey,
 });
 
+// Serve static files (like index.html) from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Define the route to serve the index.html file
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
+// Define the route for the signed URL request
 app.get('/signed-url', async (req, res) => {
   try {
     const response = await elevenlabs.conversationalAi.conversations.getSignedUrl({
-      agentId: 'agent_01jw23yyy4enj9pj7pfgpgwvme',  // apna sahi agent id yahan daalo
+      agentId: agentId,  // Use the dynamic agentId from the environment
     });
 
     console.log('API response:', response);
@@ -50,6 +52,14 @@ app.get('/signed-url', async (req, res) => {
   }
 });
 
+// Define the root route for serving the index.html file
+app.get('/', (req, res) => {
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  console.log('Serving index.html from:', indexPath); // Log path for debugging
+  res.sendFile(indexPath);
+});
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`ElevenLabs microservice running on http://localhost:${PORT}`);
 });
