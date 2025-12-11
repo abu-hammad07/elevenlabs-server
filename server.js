@@ -1,18 +1,22 @@
+import dotenv from 'dotenv';
+// Load environment variables
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { laravelEncrypt, laravelDecrypt } from "./crypto.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
-dotenv.config();
-
 const app = express();
 app.use(cors());
+app.use(express.json());
+
 
 // Define the port and check for environment variables
 const PORT = process.env.PORT || 3000;
@@ -58,6 +62,39 @@ app.get('/', (req, res) => {
   console.log('Serving index.html from:', indexPath); // Log path for debugging
   res.sendFile(indexPath);
 });
+
+
+
+// 👉 Encrypt & Decrypt API
+app.post("/crypto", (req, res) => {
+  const { action, value } = req.body;
+  if (!action || !value) {
+    return res.status(400).json({
+      error: "Missing 'action' or 'value'",
+      example: {
+        encrypt: { action: "encrypt", value: "12345" },
+        decrypt: { action: "decrypt", value: "HASH_HERE" }
+      }
+    });
+  }
+  if (action === "encrypt") {
+    return res.json({
+      action: "encrypt",
+      encrypted: laravelEncrypt(value)
+    });
+  }
+  if (action === "decrypt") {
+    return res.json({
+      action: "decrypt",
+      decrypted: laravelDecrypt(value)
+    });
+  }
+  return res.status(400).json({
+    error: "Invalid action. Use 'encrypt' or 'decrypt'"
+  });
+});
+
+
 
 // Start the server
 app.listen(PORT, () => {
