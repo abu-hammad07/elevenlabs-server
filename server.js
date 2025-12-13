@@ -328,6 +328,31 @@ app.post("/process-message", async (req, res) => {
 // =====================================================
 // 2) SIGNED URL (Realtime Agent)
 // =====================================================
+// app.get("/signed-url", async (req, res) => {
+//   console.log("🔑 Requesting signed URL...");
+
+//   try {
+//     const AGENT_ID = process.env.AGENT_ID;
+    
+//     if (!AGENT_ID) {
+//       throw new Error("AGENT_ID is not set in environment variables");
+//     }
+
+//     const url = await elevenlabs.conversationalAi.conversations.getSignedUrl({
+//       agentId: AGENT_ID,
+//     });
+
+//     console.log("✅ Signed URL generated");
+//     res.json(url);
+
+//   } catch (err) {
+//     console.error("❌ Signed URL error:", err.message);
+//     res.status(500).json({ 
+//       error: "Failed to get signed URL",
+//       details: err.message,
+//     });
+//   }
+// });
 app.get("/signed-url", async (req, res) => {
   console.log("🔑 Requesting signed URL...");
 
@@ -342,8 +367,18 @@ app.get("/signed-url", async (req, res) => {
       agentId: AGENT_ID,
     });
 
-    console.log("✅ Signed URL generated");
-    res.json(url);
+    // Extract the `agent_id` and `conversation_signature` from the response URL
+    const parsedUrl = new URL(url.signedUrl);
+    const agentIdFromUrl = parsedUrl.searchParams.get("agent_id");
+    const conversationSignatureFromUrl = parsedUrl.searchParams.get("conversation_signature");
+
+    // Build the new WebSocket URL using the format you want
+    const newWsUrl = `wss://wss.botifire.com/conversation?agent_id=${agentIdFromUrl}&conversation_signature=${conversationSignatureFromUrl}`;
+
+    console.log("✅ New WebSocket URL generated");
+
+    // Send the new WebSocket URL as response
+    res.json({ signedUrl: newWsUrl });
 
   } catch (err) {
     console.error("❌ Signed URL error:", err.message);
@@ -353,6 +388,7 @@ app.get("/signed-url", async (req, res) => {
     });
   }
 });
+
 
 
 // 👉 Encrypt & Decrypt API
