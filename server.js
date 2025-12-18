@@ -176,8 +176,7 @@ app.get("/signed-url", async (req, res) => {
 
     // 5️⃣ Response
     res.json({
-      // signedUrl: newWsUrl,
-      signedUrl: parsedUrl,
+      signedUrl: newWsUrl,
     });
 
   } catch (err) {
