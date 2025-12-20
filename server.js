@@ -160,23 +160,23 @@ app.get("/signed-url", async (req, res) => {
     // 3️⃣ URL parse karo
     const parsedUrl = new URL(response.signedUrl);
 
-    const agentIdFromUrl =
-      parsedUrl.searchParams.get("agent_id");
-    const conversationSignature =
-      parsedUrl.searchParams.get("conversation_signature");
+    // const agentIdFromUrl =
+    //   parsedUrl.searchParams.get("agent_id");
+    // const conversationSignature =
+    //   parsedUrl.searchParams.get("conversation_signature");
 
-    if (!agentIdFromUrl || !conversationSignature) {
-      throw new Error("Missing required query params in signed URL");
-    }
+    // if (!agentIdFromUrl || !conversationSignature) {
+    //   throw new Error("Missing required query params in signed URL");
+    // }
 
     // 4️⃣ Final WebSocket URL build karo
-    const newWsUrl = `wss://wss.botifire.com/conversation?agent_id=${agentIdFromUrl}&conversation_signature=${conversationSignature}`;
+    // const newWsUrl = `wss://wss.botifire.com/conversation?agent_id=${agentIdFromUrl}&conversation_signature=${conversationSignature}`;
 
     console.log("✅ WebSocket URL generated");
 
     // 5️⃣ Response
     res.json({
-      signedUrl: newWsUrl,
+      signedUrl: parsedUrl,
     });
 
   } catch (err) {
